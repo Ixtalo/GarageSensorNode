@@ -24,6 +24,16 @@ Schematics:
 `SENSORS <---> Arduino <---> Modem <-- Power line --> Modem <---> Raspberry Pi`
 
 
+## Setup
+1. Setup sender
+   * Setup wiring, refer to documentation.
+   * Upload `garagenode_sender/garagenode_sender.ino` to Arduino board.
+   * Plug into power line.
+2. Setup receiver
+   * (Setup MQTT server)
+   * `python garagenode_receiver/garagenode_receiver_mqtt.py /dev/ttyAMA0 9600`
+     * This assumes a MQTT server on localhost. If not, then look at the CLI parameters (`--help`).
+
 
 ## Power Line Communication
 ![Power Line Modem KQ-130F](doc/kq-130f_kq330.jpg)
