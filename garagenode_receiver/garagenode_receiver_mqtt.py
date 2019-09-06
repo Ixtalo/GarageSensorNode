@@ -10,7 +10,7 @@ Usage:
   garagenode_receiver_mqtt.py --version
 
 Arguments:
-  serialport      Serial port device, e.g. /dev/ttyACM0.
+  serialport      Serial port device, e.g. /dev/ttyAMA0.
   serialbaud      Serial port baud speed, e.g. 9600.
 
 Options:
@@ -47,9 +47,9 @@ from codecs import open
 import paho.mqtt.publish
 from docopt import docopt
 
-__version__ = "1.0"
+__version__ = "1.0.1"
 __date__ = "2019-09-04"
-__updated__ = "2019-09-05"
+__updated__ = "2019-09-06"
 __author__ = "Ixtalo"
 __license__ = "AGPL-3.0+"
 __email__ = "ixtalo@gmail.com"
@@ -234,7 +234,6 @@ def handle_stream(stream, mqtt_host, mqtt_port, mqtt_func=send_mqtt):
             ## only send if a condition from above is true
             if do_send and mqtt_func:
                 msgs = datadict2msgs(result)
-                #send_mqtt(msgs, mqtt_host, mqtt_port)
                 mqtt_func(msgs, mqtt_host, mqtt_port)
 
 
@@ -242,7 +241,7 @@ def main():
     arguments = docopt(__doc__, version="serial2mqtt %s (%s)" % (__version__, __updated__))
     # print(arguments)
 
-    serial_port = arguments['<serialport>']
+    serial_port = arguments['<serialport>'] ## e.g. /dev/ttyAMA0, /dev/ttyUSB0
     serial_baud = arguments['<serialbaud>']
     mqtt_host = arguments['--mqtt-host']
     mqtt_port = arguments['--mqtt-port']

@@ -2,7 +2,6 @@
 
 Garage Sensor Node via Power Line Modem
 =======================================
-AST, 08/2019  
 
 This project realizes sending UART serial protocol data via power line, the sender being an Arduino board, the receiver is a Raspberry Pi and a Python program which published to MQTT.  
 
