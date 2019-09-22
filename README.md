@@ -58,3 +58,17 @@ Schematics:
   * Modbus is a serial communications protocol originally published by Modicon (now Schneider Electric) in 1979 for use with its programmable logic controllers (PLCs). Modbus has become a de facto standard communication protocol and is now a commonly available means of connecting industrial electronic devices.
   * https://en.wikipedia.org/wiki/Modbus
   * https://www.arduino.cc/en/ArduinoModbus/ArduinoModbus
+
+
+## Arduino Pro Mini Power Consumption
+Various approaches exist to reduce the power consumption of an Arduino. Of high impact is often to remove the power LED.
+
+| Mode             | with power LED  | without power LED    |
+| ---------------- | --------------- | -------------------- |
+| Idle             | 9.5 mA          | 6 mA                 |
+| Power Down Sleep | 2.9 mA (0.01 W) | 0.15 mA (0.000495 W) |
+| Sending          | 9 mA            | 1.2 mA               | 
+
+3.3 V * 0.00015 A = 0,000495 W  
+3.3 V * 0.0029 A = 0,00957 W   
+
