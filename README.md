@@ -24,15 +24,28 @@ Schematics:
 `SENSORS <---> Arduino <---> Modem <-- Power line --> Modem <---> Raspberry Pi`
 
 
+## Prerequisites
+* Arduino Board, e.g. Arduino Pro Mini
+* Arduino Libraries:
+  * SoftwareSerial (included in Arduino SDK)
+  * DHT, https://github.com/adafruit/DHT-sensor-library
+  * Deep sleep, https://github.com/n0m1/Sleep_n0m1
+* Python 3.5+
+  * Install needed libraries with `pip3 install -r requirements.txt`
+
+
 ## Setup
 1. Setup sender
    * Setup wiring, refer to documentation.
+   * Install used libraries.
    * Upload `garagenode_sender/garagenode_sender.ino` to Arduino board.
    * Plug into power line.
 2. Setup receiver
    * (Setup MQTT server)
+   * Install libraries with `pip3 install -r requirements.txt`
    * `python garagenode_receiver/garagenode_receiver_mqtt.py /dev/ttyAMA0 9600`
      * This assumes a MQTT server on localhost. If not, then look at the CLI parameters (`--help`).
+   * For autostart: a systemd-service-script is located in `garagenode_receiver/systemd/garagenode.service`. To install copy to `/etc/systemd/system` and enable with `systemctl enable garagenode.service`.
 
 
 ## Power Line Communication
