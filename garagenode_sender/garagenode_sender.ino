@@ -12,8 +12,12 @@ const SoftwareSerial mySerial(10, 11); // RX, TX
 const Sleep sleep;
 #define SLEEPTIME 60000 // sleep time in ms
 
+// reed switch etc.
+#define SWITCH_PIN 3  // D3
 
-#define REEDSWITCH_PIN 4  // D4
+
+/////unsigned long lastMillis = 0;
+/////unsigned long currentMillis;
 
 
 struct Data 
@@ -32,8 +36,12 @@ void setup()
   mySerial.begin(9600);
   dht.begin();
 
+  // interrupt pin
+  pinMode(SWITCH_PIN, INPUT_PULLUP);
+  //////attachInterrupt(digitalPinToInterrupt(SWITCH_PIN), readAndPrint, CHANGE);
+
   // wait time for debugging
-  delay(5000);
+  delay(3000);
   Serial.println("ready!");
 }
 
@@ -54,9 +62,30 @@ void print(const Stream& stream, const Data& data)
   stream.print("$$");
 }
 
-void loop()
+void readAndPrint()
 {
-  delay(100); //delay to allow serial output to be ready after wake up
+/////  // must be before noInterrupts()
+/////  // millis() internally makes a noInterrupts() and interrupts()
+/////  currentMillis = millis();
+/////
+  // disable interrupts while reading and printing
+  noInterrupts();
+/////
+/////  // check if function was called too often too fast
+/////  unsigned long millisDiff = currentMillis - lastMillis;
+/////  if (millisDiff < 100) {
+/////    //Serial.print("too fast! ");
+/////    //Serial.print(millisDiff);
+/////    //Serial.println();
+/////    delay(100);
+/////    
+/////    return; // interrupts() gets also re-enabled by millis()
+/////  } 
+/////
+/////  // store current time
+/////  lastMillis = currentMillis;
+
+  delay(200); //delay to allow serial output to be ready after wake up
 
   digitalWrite(LED_BUILTIN, HIGH); // turn the LED on
   Data data;
@@ -69,21 +98,33 @@ void loop()
   data.light = analogRead(A0);
 
   // read reed switch status (digital on/off, 0/1)
-  data.reed_state = digitalRead(REEDSWITCH_PIN);
+  data.reed_state = digitalRead(SWITCH_PIN);
 
   digitalWrite(LED_BUILTIN, LOW); // turn the LED off
-
 
   // normal serial console output
   print(Serial, data);
   Serial.println();
+  
   // virtual serial console output
   print(mySerial, data);
 
+  interrupts(); // re-enable interrupts
+}
+
+
+
+void loop()
+{
+  readAndPrint();
+
+  Serial.println(F("sleeping..."));
+  delay(100); //delay to allow serial to fully print before sleep
 
   // sets the Arduino into power Down Mode sleep
   // The most power saving, all systems are powered down except the watch dog timer and external reset
-  Serial.println("Going to sleep...");
   sleep.pwrDownMode(); //set sleep mode
-  sleep.sleepDelay(SLEEPTIME);
+  // NOTE sleepDelay *and* sleepPinInterrupt does not work both at the same time!
+  //////DOES NOT WORK! sleep.sleepPinInterrupt(SWITCH_PIN, CHANGE);
+  sleep.sleepDelay(SLEEPTIME);  
 }
