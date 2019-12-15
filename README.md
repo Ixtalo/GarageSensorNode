@@ -24,6 +24,8 @@ Schematics:
 `SENSORS <---> Arduino <---> Modem <-- Power line --> Modem <---> Raspberry Pi`
 
 
+
+
 ## Prerequisites
 * Arduino Board, e.g. Arduino Pro Mini
 * Arduino Libraries:
@@ -32,20 +34,45 @@ Schematics:
   * Deep sleep, https://github.com/n0m1/Sleep_n0m1
 * Python 3.5+
   * Install needed libraries with `pip3 install -r requirements.txt`
+* MQTT Server
+
+
 
 
 ## Setup
-1. Setup sender
-   * Setup wiring, refer to documentation.
-   * Install used libraries.
-   * Upload `garagenode_sender/garagenode_sender.ino` to Arduino board.
-   * Plug into power line.
-2. Setup receiver
-   * (Setup MQTT server)
-   * Install libraries with `pip3 install -r requirements.txt`
-   * `python garagenode_receiver/garagenode_receiver_mqtt.py /dev/ttyAMA0 9600`
-     * This assumes a MQTT server on localhost. If not, then look at the CLI parameters (`--help`).
-   * For autostart: a systemd-service-script is located in `garagenode_receiver/systemd/garagenode.service`. To install copy to `/etc/systemd/system` and enable with `systemctl enable garagenode.service`.
+
+### Setup Sender
+1. Setup wiring on RasPi, refer to wiring library documentation.
+2. Install neccessary Arduino libraries, see above and `garagenode_sender/garagenode_sender.ino`.
+3. Upload `garagenode_sender/garagenode_sender.ino` to Arduino board.
+   1. Open in Arduino IDE
+   2. Select Tools > Arduino Pro Mini, Processor ATmega328P 5V 16 Mhz
+   3. Compile 
+   5. Click on upload and in the very next second
+   5. Reset Arduino by pressing button (or shortly connecting RST+GND)
+4. Plug into power line.
+
+
+### Setup Receiver
+0. Preparation:
+   * Setup MQTT server
+   * 
+1. Hardware Setup
+   | RasPi      | KQ330 Powerline Modem |
+   | ---------- | --------------------- |
+   | +5 VCC     | VCC |
+   | GND        | GND |
+   | RXD = Pin 10 = WiringPi 16 = GPIO 15       | TX  |
+
+2. Install Python libraries with `pip3 install -r requirements.txt`
+
+3. `python garagenode_receiver/garagenode_receiver_mqtt.py /dev/ttyAMA0 9600` 
+   This assumes a MQTT server on localhost. If not, then look at the CLI parameters (`--help`).
+
+
+#### Receiver Autostart (systemd)
+A systemd-service-script is located in `garagenode_receiver/systemd/garagenode.service`.  
+For install, copy to `/etc/systemd/system` and enable with `systemctl enable garagenode.service`.
 
 
 ## Power Line Communication
@@ -85,3 +112,10 @@ Various approaches exist to reduce the power consumption of an Arduino. Of high 
 3.3 V * 0.00015 A = 0,000495 W  
 3.3 V * 0.0029 A = 0,00957 W   
 
+
+## My Setup
+Sender box:  
+![Sender Box](doc/garagenode_sender_v1_box.jpg)
+
+Sender setup and wiring:  
+![Sender Setup](doc/garagenode_sender_v1_setup.jpg)
