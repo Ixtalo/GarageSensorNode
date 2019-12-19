@@ -114,8 +114,11 @@ Various approaches exist to reduce the power consumption of an Arduino. Of high 
 
 
 ## My Setup
-Sender box:  
-![Sender Box](doc/garagenode_sender_v1_box.jpg)
 
-Sender setup and wiring:  
-![Sender Setup](doc/garagenode_sender_v1_setup.jpg)
+### Sender
+![Sender Box outside](doc/garagenode_sender_v1_box.jpg)  
+![Sender Box inside](doc/garagenode_sender_v2_box.jpg)  
+
+### Receiver
+![Receiver](doc/garagenode_receiver_v2_1.jpg)  
+![Receiver](doc/garagenode_receiver_v2_2.jpg)  
