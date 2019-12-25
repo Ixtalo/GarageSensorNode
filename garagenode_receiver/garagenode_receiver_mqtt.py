@@ -57,9 +57,6 @@ __status__ = "Production"
 
 ## Time in seconds between MQTT messages
 MQTT_TIME_PERIOD = 600
-## Base string for the MQTT topic
-MQTT_TOPIC_BASE = '/garagenode/'
-
 
 ###############################################################################
 ###############################################################################
@@ -77,16 +74,20 @@ __script_dir = os.path.dirname(os.path.realpath(__file__))
 
 ## **L:140;H:29.90;T:27.60;R:0$$
 ## **L:140;H:nan;T:nan;R:0$$
-regex = re.compile('(?:L:(\d+));(?:H:(\d+\.\d\d?|nan));(?:T:(\d+\.\d\d?|nan));(?:R:(\d))')
+regex = re.compile("(?:L:(\d+));(?:H:(\d+\.\d\d?|nan));(?:T:(\d+\.\d\d?|nan));(?:R:(\d))")
 
 ## configuration, e.g., from JSON file
 configuration = {}
 
 
 def send_mqtt(msgs):
+    if DEBUG:
+        logging.warning("DEBUG mode, not sending to MQTT")
+        return
+
     global configuration
-    mqtt_host = configuration.get('mqtt_host', None)
-    mqtt_port = configuration.get('mqtt_port', None)
+    mqtt_host = configuration.get('mqtt_host')
+    mqtt_port = configuration.get('mqtt_port')
     mqtt_user = configuration.get('mqtt_user', None)
     mqtt_pass = configuration.get('mqtt_pass', None)
     assert mqtt_host, 'Configuration mqtt_host is mandatory!'
@@ -96,7 +97,8 @@ def send_mqtt(msgs):
                                hostname=mqtt_host,
                                port=mqtt_port,
                                client_id='garagenode',
-                               auth={'username': mqtt_user, 'password': mqtt_pass} if (mqtt_user and mqtt_pass) else None
+                               auth={'username': mqtt_user, 'password': mqtt_pass} if (
+                                           mqtt_user and mqtt_pass) else None
                                )
 
 
@@ -137,11 +139,14 @@ class DataEntries(object):
 
 
 def datadict2msgs(dataentries: DataEntries):
+    global configuration
+    topic_base = configuration['mqtt_topic_base']
+
     msgs = []
     for key in dataentries.keys():
         d = dataentries[key]
         assert type(d) is Message
-        msgs.append({'topic': MQTT_TOPIC_BASE + d.name, 'payload': d.value, 'retain': d.retain})
+        msgs.append({'topic': topic_base + d.name, 'payload': d.value, 'retain': d.retain})
     return msgs
 
 
@@ -247,14 +252,16 @@ def handle_stream(stream):
             ## periodic sending, make sure to send not too often
             now = datetime.datetime.now()
             tdiff_seconds = (now - last_dt).total_seconds()
-            print(result, tdiff_seconds)
+            logging.debug(result, tdiff_seconds)
             if tdiff_seconds > MQTT_TIME_PERIOD:
                 last_dt = now
                 do_send = True
 
             ## only send if a condition from above is true
             if do_send:
+                ## converting result array to MQTT messages
                 msgs = datadict2msgs(result)
+                ## send to MQTT
                 send_mqtt(msgs)
 
 
@@ -274,7 +281,7 @@ def load_config(filename):
 
 def main():
     arguments = docopt(__doc__, version="serial2mqtt %s (%s)" % (__version__, __updated__))
-    #print(arguments)
+    # print(arguments)
 
     ## setup logging
     logging.basicConfig(level=logging.DEBUG if DEBUG else logging.WARN)
