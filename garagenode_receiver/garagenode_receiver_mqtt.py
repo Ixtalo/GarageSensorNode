@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""garagenode_receiver_mqtt.py - SHORT DESC
+"""garagenode_receiver_mqtt.py - GarageNode receiver to publish UART messages to MQTT.
 
-LONG DESC
+Listen on UART serial for GarageNode sender messages and publish them to MQTT message broker.
+The MQTT configuration is done via garagenode_receiver_mqtt.json.
 
 Usage:
-  garagenode_receiver_mqtt.py <serialport> <serialbaud> [--mqtt-host=IP] [--mqtt-port=N]
+  garagenode_receiver_mqtt.py <config.json>
   garagenode_receiver_mqtt.py -h | --help
   garagenode_receiver_mqtt.py --version
 
 Arguments:
-  serialport      Serial port device, e.g. /dev/ttyAMA0.
-  serialbaud      Serial port baud speed, e.g. 9600.
+  config.json     Configuration file in JSON format.
 
 Options:
   -h --help       Show this screen.
-  --mqtt-host=IP  MQTT host address (IP or hostname) [default: localhost].
-  --mqtt-port=N   MQTT port number [default: 1883].
   --version       Show version.
 """
 ##
@@ -38,18 +36,20 @@ Options:
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+import datetime
+import json
 import os
 import re
 import sys
-import serial
-import datetime
 from codecs import open
+import logging
 import paho.mqtt.publish
+import serial
 from docopt import docopt
 
-__version__ = "1.0.1"
+__version__ = "1.2"
 __date__ = "2019-09-04"
-__updated__ = "2019-09-06"
+__updated__ = "2019-12-25"
 __author__ = "Ixtalo"
 __license__ = "AGPL-3.0+"
 __email__ = "ixtalo@gmail.com"
@@ -60,27 +60,44 @@ MQTT_TIME_PERIOD = 600
 ## Base string for the MQTT topic
 MQTT_TOPIC_BASE = '/garagenode/'
 
-###############################################################################
-###############################################################################
-###############################################################################
 
-DEBUG = os.environ.get('DEBUG')
-TESTRUN = 0
-PROFILE = 0
-__script_dir = os.path.dirname(os.path.realpath(__file__))
+###############################################################################
+###############################################################################
+###############################################################################
 
 ## check for Python3
 if sys.version_info < (3, 0):
     sys.stderr.write("Minimum required version is Python 3.x!\n")
     sys.exit(1)
 
+DEBUG = os.environ.get('DEBUG')
+TESTRUN = 0
+PROFILE = 0
+__script_dir = os.path.dirname(os.path.realpath(__file__))
+
 ## **L:140;H:29.90;T:27.60;R:0$$
 ## **L:140;H:nan;T:nan;R:0$$
 regex = re.compile('(?:L:(\d+));(?:H:(\d+\.\d\d?|nan));(?:T:(\d+\.\d\d?|nan));(?:R:(\d))')
 
+## configuration, e.g., from JSON file
+configuration = {}
 
-def send_mqtt(msgs, mqtt_host, mqtt_port):
-    paho.mqtt.publish.multiple(msgs=msgs, hostname=mqtt_host, port=mqtt_port, client_id='garagenode')
+
+def send_mqtt(msgs):
+    global configuration
+    mqtt_host = configuration.get('mqtt_host', None)
+    mqtt_port = configuration.get('mqtt_port', None)
+    mqtt_user = configuration.get('mqtt_user', None)
+    mqtt_pass = configuration.get('mqtt_pass', None)
+    assert mqtt_host, 'Configuration mqtt_host is mandatory!'
+    assert mqtt_port, 'Configuration mqtt_port is mandatory!'
+    logging.debug("Sending to MQTT... (%s:%d)", mqtt_host, mqtt_port)
+    paho.mqtt.publish.multiple(msgs=msgs,
+                               hostname=mqtt_host,
+                               port=mqtt_port,
+                               client_id='garagenode',
+                               auth={'username': mqtt_user, 'password': mqtt_pass} if (mqtt_user and mqtt_pass) else None
+                               )
 
 
 ## data "struct"
@@ -110,7 +127,7 @@ class DataEntries(object):
     def keys(self):
         return self.entries.keys()
 
-    def add(self, entry:Message):
+    def add(self, entry: Message):
         assert type(entry) is Message
         self.entries[entry.name] = entry
         return self
@@ -189,7 +206,11 @@ def look_in_stream(stream):
     return None
 
 
-def handle_stream(stream, mqtt_host, mqtt_port, mqtt_func=send_mqtt):
+def handle_stream(stream):
+    """
+    Handle GarageNode sender UART messages.
+    :param stream:  input stream, i.e., serial UART stream
+    """
     assert stream.readable()
 
     last_dt = datetime.datetime.min
@@ -232,24 +253,44 @@ def handle_stream(stream, mqtt_host, mqtt_port, mqtt_func=send_mqtt):
                 do_send = True
 
             ## only send if a condition from above is true
-            if do_send and mqtt_func:
+            if do_send:
                 msgs = datadict2msgs(result)
-                mqtt_func(msgs, mqtt_host, mqtt_port)
+                send_mqtt(msgs)
+
+
+def load_config(filename):
+    """
+    Load configuration from file
+    :param filename:
+    """
+    global configuration
+    config_filepath = os.path.join(__script_dir, filename)
+    if not os.path.exists(config_filepath):
+        raise RuntimeError("No config file! Expected:%s" % os.path.abspath(config_filepath))
+    with open(config_filepath) as fin:
+        logging.debug('Loading config JSON ... (%s)', config_filepath)
+        configuration = json.load(fin)
 
 
 def main():
     arguments = docopt(__doc__, version="serial2mqtt %s (%s)" % (__version__, __updated__))
-    # print(arguments)
+    #print(arguments)
 
-    serial_port = arguments['<serialport>'] ## e.g. /dev/ttyAMA0, /dev/ttyUSB0
-    serial_baud = arguments['<serialbaud>']
-    mqtt_host = arguments['--mqtt-host']
-    mqtt_port = arguments['--mqtt-port']
+    ## setup logging
+    logging.basicConfig(level=logging.DEBUG if DEBUG else logging.WARN)
 
+    ## load configuration from JSON file
+    load_config(arguments['<config.json>'])
+
+    ## setup input stream
+    serial_port = configuration['serial_port']
+    serial_baud = configuration['serial_baud']
     if DEBUG:
+        ## for debugging use a binary capture sample
         stream = open('../tools/serial2file.bin', 'rb')
         print(stream.name)
     else:
+        ## setup real serial device
         stream = serial.Serial(
             port=serial_port,
             baudrate=serial_baud,
@@ -258,7 +299,8 @@ def main():
             bytesize=serial.EIGHTBITS
         )
 
-    handle_stream(stream, mqtt_host, mqtt_port, mqtt_func=None if DEBUG else send_mqtt)
+    ## handle stream, i.e., listen for incoming data
+    handle_stream(stream)
 
 
 if __name__ == "__main__":
