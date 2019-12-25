@@ -9,6 +9,13 @@ from unittest.mock import MagicMock, patch
 class MyTestCase(unittest.TestCase):
 
     def setUp(self):
+        garagenode_receiver_mqtt.configuration = {
+            'mqtt_host': 'localhost',
+            'mqtt_port': 1883,
+            'mqtt_user': 'foo',
+            'mqtt_pass': 'bar',
+            "mqtt_topic_base": "/foobar/"
+        }
         garagenode_receiver_mqtt.send_mqtt = MagicMock(logging.warning("MOCKED send_mqtt!! Doing nothing."))
 
     def test_datadict2msgs(self):
@@ -20,24 +27,24 @@ class MyTestCase(unittest.TestCase):
 
         ## a single element
         actual = datadict2msgs(DataEntries().add(Message('light', 11, False)))
-        assert actual == [{'payload': 11, 'retain': False, 'topic': '/garagenode/light'}]
+        assert actual == [{'payload': 11, 'retain': False, 'topic': '/foobar/light'}]
 
         ## another single element
         actual = datadict2msgs(DataEntries().add(Message('light', 11, True)))
-        assert actual == [{'payload': 11, 'retain': True, 'topic': '/garagenode/light'}]
+        assert actual == [{'payload': 11, 'retain': True, 'topic': '/foobar/light'}]
 
         ## change topic base
-        garagenode_receiver_mqtt.MQTT_TOPIC_BASE = 'foobar/'
+        garagenode_receiver_mqtt.configuration['mqtt_topic_base'] = 'blubba/'
         actual = datadict2msgs(DataEntries().add(Message('light', 11, False)))
-        assert actual == [{'payload': 11, 'retain': False, 'topic': 'foobar/light'}]
+        assert actual == [{'payload': 11, 'retain': False, 'topic': 'blubba/light'}]
 
         ## checking of unhandled names
         actual = datadict2msgs(DataEntries().add(Message('AAA', 11, False)))
-        assert actual == [{'payload': 11, 'retain': False, 'topic': 'foobar/AAA'}]
+        assert actual == [{'payload': 11, 'retain': False, 'topic': 'blubba/AAA'}]
 
         ## checking of handled and undhandled
         actual = datadict2msgs(DataEntries().add(Message('AAA', 11, False)).add(Message('light', 22, False)))
-        assert actual == [{'payload': 11, 'retain': False, 'topic': 'foobar/AAA'}, {'payload': 22, 'retain': False, 'topic': 'foobar/light'}]
+        assert actual == [{'payload': 11, 'retain': False, 'topic': 'blubba/AAA'}, {'payload': 22, 'retain': False, 'topic': 'blubba/light'}]
 
     def test_handle_stream_empty(self):
         ## check with empty stream
@@ -52,14 +59,6 @@ class MyTestCase(unittest.TestCase):
         stream.write(b'...............')
         stream.seek(0)  ## needed!
 
-        garagenode_receiver_mqtt.configuration = {
-            'mqtt_host': 'localhost',
-            'mqtt_port': 1883,
-            'mqtt_user': 'foo',
-            'mqtt_pass': 'bar',
-            "mqtt_topic_base": "/fooobar/"
-        }
-
         ## prepare mocking
         garagenode_receiver_mqtt.send_mqtt = MagicMock()
 
@@ -72,4 +71,4 @@ class MyTestCase(unittest.TestCase):
         msgs = call0[0][0]
         assert len(msgs) == 4
         assert type(msgs) is list
-        assert msgs[0] == {'topic': '/fooobar/light', 'payload': 11, 'retain': False}, msgs[0]
+        assert msgs[0] == {'topic': '/foobar/light', 'payload': 11, 'retain': False}, msgs[0]
