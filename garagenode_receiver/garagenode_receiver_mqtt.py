@@ -97,8 +97,8 @@ def send_mqtt(msgs):
                                hostname=mqtt_host,
                                port=mqtt_port,
                                client_id='garagenode',
-                               auth={'username': mqtt_user, 'password': mqtt_pass} if (
-                                           mqtt_user and mqtt_pass) else None
+                               ## password could be None
+                               auth={'username': mqtt_user, 'password': mqtt_pass} if mqtt_user else None
                                )
 
 
