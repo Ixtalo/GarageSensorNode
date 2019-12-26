@@ -4,7 +4,7 @@ Description=Garage Node Receiver MQTT
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /mnt/data/mydata/garagenode/garagenode_receiver_mqtt.py /dev/ttyAMA0 9600
+ExecStart=/usr/bin/python3 /mnt/data/garagenode/garagenode_receiver_mqtt.py config.json
 Nice=-5
 User=ast
 Restart=on-failure

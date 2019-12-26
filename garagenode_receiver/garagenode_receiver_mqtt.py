@@ -265,17 +265,21 @@ def handle_stream(stream):
                 send_mqtt(msgs)
 
 
-def load_config(filename):
+def load_config(filepath):
     """
-    Load configuration from file
-    :param filename:
+    Load configuration from file.
+    :param filepath: file name or file path for configuration JSON file
     """
     global configuration
-    config_filepath = os.path.join(__script_dir, filename)
-    if not os.path.exists(config_filepath):
-        raise RuntimeError("No config file! Expected:%s" % os.path.abspath(config_filepath))
-    with open(config_filepath) as fin:
-        logging.debug('Loading config JSON ... (%s)', config_filepath)
+    if not os.path.isabs(filepath):
+        ## if not an absolute path name, then use config filename relative
+        ## to this very script's directory
+        filepath = os.path.join(__script_dir, filepath)
+    filepath = os.path.abspath(filepath)
+    if not os.path.exists(filepath):
+        raise RuntimeError("No config file! Expected:%s" % filepath)
+    with open(filepath) as fin:
+        logging.debug('Loading config JSON ... (%s)', filepath)
         configuration = json.load(fin)
 
 
