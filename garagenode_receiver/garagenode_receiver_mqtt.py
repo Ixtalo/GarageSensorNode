@@ -47,9 +47,9 @@ import paho.mqtt.publish
 import serial
 from docopt import docopt
 
-__version__ = "1.2"
+__version__ = "1.2.1"
 __date__ = "2019-09-04"
-__updated__ = "2019-12-25"
+__updated__ = "2019-12-26"
 __author__ = "Ixtalo"
 __license__ = "AGPL-3.0+"
 __email__ = "ixtalo@gmail.com"
