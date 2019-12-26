@@ -47,7 +47,7 @@ import paho.mqtt.publish
 import serial
 from docopt import docopt
 
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 __date__ = "2019-09-04"
 __updated__ = "2019-12-26"
 __author__ = "Ixtalo"
@@ -284,7 +284,7 @@ def load_config(filepath):
 
 
 def main():
-    arguments = docopt(__doc__, version="serial2mqtt %s (%s)" % (__version__, __updated__))
+    arguments = docopt(__doc__, version="garagenode_receiver_mqtt %s (%s)" % (__version__, __updated__))
     # print(arguments)
 
     ## setup logging
