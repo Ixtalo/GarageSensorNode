@@ -83,9 +83,24 @@ For install, copy to `/etc/systemd/system` and enable with `systemctl enable gar
 * Mamba - Narrow Band Powerline Communication Shield for Arduino
 	* http://cutedigi.com/mamba-narrow-band-powerline-communication-shield-for-arduino/
 * X10 Protokoll (129 kHz)
+  * https://en.wikipedia.org/wiki/X10_(industry_standard)
+    > X10 is a protocol for communication among electronic devices used for home automation (domotics). It primarily uses power line wiring for signaling and control, where the signals involve brief radio frequency bursts representing digital information.
+  * https://www.remote.org/frederik/projects/x10/index.html.de
+  * X-10 and 230V 
+    * https://web.archive.org/web/20160303204828/https://www.redoak.co.uk/hpx10240v.html
+    * Umbau 230V
+      * https://www.remote.org/frederik/projects/x10/rr/
+      * https://www.remote.org/frederik/projects/x10/lm/
+  * X10 XM10 Zwei-Wege-Powerline-Interface, 50 €, https://www.intellihome.be/de/x10-xm10-zwei-wege-powerline-interface.html
+  * Arduino X10 library, https://www.arduino.cc/en/Tutorial/x10
+  * CM15 Pro - Enhanced Computer Interface Module ($139.00), http://www.whomedigital.com.au/prod3.htm
 * HomePlug Green PHY
 	* https://www.codico.com/de/Produkte/HomePlug-Green-Phy.htm
 	* https://smartcharging.in-tech.com/product/plc-stamp-1/
+* https://de.wikipedia.org/wiki/Tr%C3%A4gerfrequenzanlage
+  > Als Trägerfrequenzanlage (TFA) bezeichnet man eine Vorrichtung zur Sprach- oder Datenübertragung über vorhandene Kommunikations- oder Stromnetze.
+* Hardware
+  * https://web.archive.org/web/20130524165435/http://misterhouse.wikispaces.com/interfaces
 
 
 ## Arduino & Robust Serial Communication
