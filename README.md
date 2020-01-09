@@ -137,3 +137,22 @@ Various approaches exist to reduce the power consumption of an Arduino. Of high 
 ### Receiver
 ![Receiver](doc/garagenode_receiver_v2_1.jpg)  
 ![Receiver](doc/garagenode_receiver_v2_2.jpg)  
+
+
+## Wiring
+
+![Wiring Sender](doc/garagenode_sender.png)  
+
+The sender has:
+* Fuse 125 mA
+* KQ-330F, sender pin is RX (!), connected to Arduino D11
+* DHT22, Arduino D2
+* LDR, Arduino A0
+* Reed switch, Arduino D3
+
+
+![Wiring Receiver](doc/garagenode_receiver.png)  
+
+The receiver has:
+* Fuse 125 mA
+* KQ-330F, receiver pin is TX (!), connected to e.g. RasPi
