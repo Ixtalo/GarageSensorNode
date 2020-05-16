@@ -1,0 +1,4 @@
+admin:admin
+user:user
+guest:guest
+foo:bar

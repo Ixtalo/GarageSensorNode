@@ -1,1 +1,4 @@
 foo:$6$uNsvQoDWZKHuMLkp$+GJLtO5xbWl3r0+amvWBRW0bDuQGcKdw8fsjMOMR9+ZLcm4TyU1zX8sP7iLV9MBYpzweeHhWVwn/Tlp09EtgJw==
+admin:$6$Viu1EuTjQSGy1nRB$0NdWpGW2Xlh7fnSsVr+UAG4n//pPZ4qJ56WWl+u3OO7XeJfV8l3gGVXYCgeiOwyRuF88U8T2AgaSOB6rGciAcQ==
+user:$6$NqiU+rEnG1rf4gCO$oVPkFfhiNdXSnLu4aAF7WMkNuukecXMglerLnAq0JlQm1ezoPSbvYqSjJu09glXw2Ps6xyL6ivNDO8wYJXrQlg==
+guest:$6$1s/X/Ic4qTqGPcT5$MmNp2JPObXa8jSRDfselvHfcy+bJrapNw+Y//wRYvcaUqxtsxSefFMs2TjCTwJcXVQM9vEvLyH7yMld1HmHP8Q==
