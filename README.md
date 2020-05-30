@@ -3,15 +3,18 @@
 Garage Sensor Node via Power Line Modem
 =======================================
 
-This project realizes sending UART serial protocol data via power line, the sender being an Arduino board, the receiver is a Raspberry Pi and a Python program which published to MQTT.  
+This project realizes sending UART serial protocol data via power line, the sender being an Arduino board, the receiver is a Raspberry Pi with a Python program which publishes to MQTT.  
+
 
 ## Challenge
-The challenge has been to send data (e.g., temperature sensor readings) from the outside garage to the server inside the main house. The gerage is located away from the house and multiple concrete walls are blocking the line of sight, making radio communication almost impossible.  
+The challenge has been to send data (e.g., temperature sensor readings) from an outside garage to a server (RasPi) inside the main house. 
+The gerage is located some distance away from the house and multiple concrete walls are blocking the line of sight, making radio communication impossible.  
+But, there is one single phased power line between the house and the garage. Just the power line, no empty conduit.  
 
-But, there is one single phased power line between the house and the garage. Only the power line, no empty conduit.  
 
-## Solution
-The solution is to use the power line as a carrier. A power line modem is used to send sensor readings periodically over the power line.  
+## Solution Approach
+The solution approach is to use the power line as  carrier. 
+A power line modem is used to send sensor readings periodically over the power line.  
 
 The involved components:  
 * Arduino Pro mini as sender
@@ -41,7 +44,7 @@ Schematics:
 
 ## Setup
 
-### Setup Sender
+### Software Setup Sender
 1. Setup wiring on RasPi, refer to wiring library documentation.
 2. Install neccessary Arduino libraries, see above and `garagenode_sender/garagenode_sender.ino`.
 3. Upload `garagenode_sender/garagenode_sender.ino` to Arduino board.
@@ -53,10 +56,10 @@ Schematics:
 4. Plug into power line.
 
 
-### Setup Receiver
+### Software Setup Receiver
 0. Preparation:
    * Setup MQTT server
-   * 
+  
 1. Hardware Setup
    | RasPi      | KQ330 Powerline Modem |
    | ---------- | --------------------- |
@@ -73,6 +76,27 @@ Schematics:
 #### Receiver Autostart (systemd)
 A systemd-service-script is located in `garagenode_receiver/systemd/garagenode.service`.  
 For install, copy to `/etc/systemd/system` and enable with `systemctl enable garagenode.service`.
+
+
+### Hardware Wiring
+
+![Wiring Sender](doc/GarageNode_sender.png)  
+
+The sender has:
+* Fuse 125 mA
+* KQ-330F, sender pin is RX (!), connected to Arduino D11
+* DHT22, Arduino D2
+* LDR, Arduino A0
+* Reed switch, Arduino D3
+
+
+![Wiring Receiver](doc/GarageNode_receiver.png)  
+
+The receiver has:
+* Fuse 125 mA
+* KQ-330F, receiver pin is TX (!), connected to e.g. RasPi
+
+
 
 
 ## Power Line Communication
@@ -126,33 +150,3 @@ Various approaches exist to reduce the power consumption of an Arduino. Of high 
 
 3.3 V * 0.00015 A = 0,000495 W  
 3.3 V * 0.0029 A = 0,00957 W   
-
-
-## My Setup
-
-### Sender
-![Sender Box outside](doc/garagenode_sender_v1_box.jpg)  
-![Sender Box inside](doc/garagenode_sender_v2_box.jpg)  
-
-### Receiver
-![Receiver](doc/garagenode_receiver_v2_1.jpg)  
-![Receiver](doc/garagenode_receiver_v2_2.jpg)  
-
-
-## Wiring
-
-![Wiring Sender](doc/garagenode_sender.png)  
-
-The sender has:
-* Fuse 125 mA
-* KQ-330F, sender pin is RX (!), connected to Arduino D11
-* DHT22, Arduino D2
-* LDR, Arduino A0
-* Reed switch, Arduino D3
-
-
-![Wiring Receiver](doc/garagenode_receiver.png)  
-
-The receiver has:
-* Fuse 125 mA
-* KQ-330F, receiver pin is TX (!), connected to e.g. RasPi
