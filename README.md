@@ -16,6 +16,8 @@ But, there is one single phased power line between the house and the garage. Jus
 The solution approach is to use the power line as  carrier. 
 A power line modem is used to send sensor readings periodically over the power line.  
 
+![Concept](doc/concept.png)
+
 The involved components:  
 * Arduino Pro mini as sender
   * `garagenode_sender/garagenode_sender.ino`
