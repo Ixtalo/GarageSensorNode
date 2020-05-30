@@ -152,3 +152,7 @@ Various approaches exist to reduce the power consumption of an Arduino. Of high 
 
 3.3 V * 0.00015 A = 0,000495 W  
 3.3 V * 0.0029 A = 0,00957 W   
+
+
+## License
+AGPL3, see [LICENSE](LICENSE).
