@@ -1,0 +1,12 @@
+## https://docs.docker.com/compose/
+version: "3"
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - 1883:1883
+    volumes:
+      - "./config/:/mosquitto/config/"
+      #- "./log/:/mosquitto/log/"
+      #- "./data/:/mosquitto/data/"

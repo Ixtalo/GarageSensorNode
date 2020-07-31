@@ -1,0 +1,17 @@
+[Unit]
+Description=Garage Node Receiver MQTT
+
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /mnt/data/garagenode/garagenode_receiver_mqtt.py config.json
+Nice=-5
+User=ast
+Restart=on-failure
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=garagenode
+
+
+[Install]
+WantedBy=multi-user.target

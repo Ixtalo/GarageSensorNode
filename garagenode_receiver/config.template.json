@@ -1,0 +1,9 @@
+{
+  "serial_port": "/dev/ttyAMA0",
+  "serial_baud": 9600,
+  "mqtt_host": "localhost",
+  "mqtt_port": 1883,
+  "mqtt_user": "foo",
+  "mqtt_pass": "bar",
+  "mqtt_topic_base": "tele/garagenode/"
+}
