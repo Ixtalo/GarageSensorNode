@@ -3,18 +3,20 @@
 #include <DHT.h>  // https://github.com/adafruit/DHT-sensor-library
 #include <Sleep_n0m1.h> // https://github.com/n0m1/Sleep_n0m1
 
+// sleep time in ms
+#define SLEEPTIME 30000
 
-#define DHTPIN 2
+// reed switches GPIO pins
+#define SWITCH1_PIN 3  // D3
+#define SWITCH2_PIN 4  // D4
+
+// DHT22 GPIO pin
+#define DHTPIN 2  // D2
 #define DHTTYPE DHT22
-const DHT dht(DHTPIN, DHTTYPE);
 
+const DHT dht(DHTPIN, DHTTYPE);
 const SoftwareSerial mySerial(10, 11); // RX, TX
 const Sleep sleep;
-#define SLEEPTIME 60000 // sleep time in ms
-
-// reed switch etc.
-#define SWITCH_PIN 3  // D3
-
 
 /////unsigned long lastMillis = 0;
 /////unsigned long currentMillis;
@@ -25,7 +27,8 @@ struct Data
   unsigned int light = -1;
   float temperature = -1;
   float humidity = -1;
-  bool reed_state = false;
+  bool switch1 = false;
+  bool switch2 = false;
 };
 
 
@@ -36,8 +39,8 @@ void setup()
   mySerial.begin(9600);
   dht.begin();
 
-  // interrupt pin
-  pinMode(SWITCH_PIN, INPUT_PULLUP);
+  pinMode(SWITCH1_PIN, INPUT);
+  pinMode(SWITCH2_PIN, INPUT);
   //////attachInterrupt(digitalPinToInterrupt(SWITCH_PIN), readAndPrint, CHANGE);
 
   // wait time for debugging
@@ -47,18 +50,29 @@ void setup()
 
 void print(const Stream& stream, const Data& data)
 {
+  // begin-marker
   stream.print("**");
+
   stream.print("L:");
   stream.print(data.light);
   stream.print(";");
+
   stream.print("H:");
   stream.print(data.humidity);
   stream.print(";");
+
   stream.print("T:");
   stream.print(data.temperature);
   stream.print(";");
-  stream.print("R:");
-  stream.print(data.reed_state);
+
+  stream.print("S1:");
+  stream.print(data.switch1);
+  stream.print(";");
+
+  stream.print("S2:");
+  stream.print(data.switch2);
+
+  // end-marker
   stream.print("$$");
 }
 
@@ -97,8 +111,9 @@ void readAndPrint()
   // read LDR - Light Dependent Resistor at A0
   data.light = analogRead(A0);
 
-  // read reed switch status (digital on/off, 0/1)
-  data.reed_state = digitalRead(SWITCH_PIN);
+  // read switch status (digital on/off, 0/1)
+  data.switch1 = !digitalRead(SWITCH1_PIN);
+  data.switch2 = !digitalRead(SWITCH2_PIN);
 
   digitalWrite(LED_BUILTIN, LOW); // turn the LED off
 

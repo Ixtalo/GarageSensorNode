@@ -7,12 +7,14 @@ This project realizes sending UART serial protocol data via power line, the send
 
 
 ## Challenge
+
 The challenge has been to send data (e.g., temperature sensor readings) from an outside garage to a server (RasPi) inside the main house. 
 The gerage is located some distance away from the house and multiple concrete walls are blocking the line of sight, making radio communication impossible.  
 But, there is one single phased power line between the house and the garage. Just the power line, no empty conduit.  
 
 
 ## Solution Approach
+
 The solution approach is to use the power line as  carrier. 
 A power line modem is used to send sensor readings periodically over the power line.  
 
@@ -32,11 +34,12 @@ Schematics:
 
 
 ## Prerequisites
+
 * Arduino Board, e.g. Arduino Pro Mini
 * Arduino Libraries:
   * SoftwareSerial (included in Arduino SDK)
-  * DHT, https://github.com/adafruit/DHT-sensor-library
-  * Deep sleep, https://github.com/n0m1/Sleep_n0m1
+  * DHT, https://github.com/adafruit/DHT-sensor-library/releases/tag/1.4.3
+  * Deep sleep, https://github.com/n0m1/Sleep_n0m1/releases/tag/v1.1.1
 * Python 3.5+
   * Install needed libraries with `pip3 install -r requirements.txt`
 * MQTT Server
@@ -47,21 +50,34 @@ Schematics:
 ## Setup
 
 ### Software Setup Sender
-1. Setup wiring on RasPi, refer to wiring library documentation.
-2. Install neccessary Arduino libraries, see above and `garagenode_sender/garagenode_sender.ino`.
-3. Upload `garagenode_sender/garagenode_sender.ino` to Arduino board.
-   1. Open in Arduino IDE
-   2. Select Tools > Arduino Pro Mini, Processor ATmega328P 5V 16 Mhz
-   3. Compile 
-   5. Click on upload and in the very next second
-   5. Reset Arduino by pressing button (or shortly connecting RST+GND)
-4. Plug into power line.
+
+1. Install neccessary Arduino libraries, see above and `garagenode_sender/garagenode_sender.ino`.
+2. Open `garagenode_sender/garagenode_sender.ino` in Arduino IDE
+3. Select 
+    * Tools > Arduino Pro Mini
+    * Processor: ATmega328P 5V 16 Mhz
+    * Programmer: AVR ISP  
+    * ![Arduino IDE Setup](./doc/arduino-ide-setup.png)
+4. Compile / verify
+5. Connect USB-Serial (TTY) to RXD, TXD, GND and VCC. 
+    * USB-TTY RXD <--> Arduino TXD
+    * USB-TTY TXD <--> Arduino RXD
+    * ![Arduino Pro Mini USB Serial](./doc/arduino-mini-pro_serial.jpg)
+6. Upload: click on upload and in the very next second reset Arduino by pressing button (or shortly connecting RST+GND)
+7. Done flashing.
+8. Check if it's working:
+    * `screen /dev/ttyUSB0 9600`
+    * ![Example output](./doc/example_output.png)
+9. Plug into power-line.
+
 
 
 ### Software Setup Receiver
+
 0. Preparation:
-   * Setup MQTT server
-  
+  * Setup MQTT server
+  * Setup wiring on RasPi, refer to wiring library documentation.
+
 1. Hardware Setup
    | RasPi      | KQ330 Powerline Modem |
    | ---------- | --------------------- |
@@ -76,6 +92,7 @@ Schematics:
 
 
 #### Receiver Autostart (systemd)
+
 A systemd-service-script is located in `garagenode_receiver/systemd/garagenode.service`.  
 For install, copy to `/etc/systemd/system` and enable with `systemctl enable garagenode.service`.
 
@@ -85,16 +102,30 @@ For install, copy to `/etc/systemd/system` and enable with `systemctl enable gar
 ![Wiring Sender](doc/GarageNode_sender.png)  
 
 The sender has:
+
 * Fuse 125 mA
 * KQ-330F, sender pin is RX (!), connected to Arduino D11
 * DHT22, Arduino D2
 * LDR, Arduino A0
-* Reed switch, Arduino D3
+* switch 1, Arduino D3, pulldown circuit
+* switch 2, Arduino D4, pulldown circuit
+
+| State | V     | mA      | digitalRead |
+| ----- | ----- | ------- | ----------- |
+| open  | 0,0 V | 0,43 mA | 1           |
+| close | 4,4 V | 0,0 mA  | 0           |
+
+open: e.g., door open, water-level high
+
+close: e.g., door closed, water-level low
+
+
 
 
 ![Wiring Receiver](doc/GarageNode_receiver.png)  
 
 The receiver has:
+
 * Fuse 125 mA
 * KQ-330F, receiver pin is TX (!), connected to e.g. RasPi
 
@@ -102,6 +133,7 @@ The receiver has:
 
 
 ## Power Line Communication
+
 ![Power Line Modem KQ-130F](doc/kq-130f_kq330.jpg)
 
 * KQ-130F
@@ -130,6 +162,7 @@ The receiver has:
 
 
 ## Arduino & Robust Serial Communication
+
 * https://stackoverflow.com/questions/815758/simple-serial-point-to-point-communication-protocol
 * HDLC High-Level Data Link Control
   * High-Level Data Link Control (HDLC) is a bit-oriented code-transparent synchronous data link layer protocol developed by the International Organization for Standardization (ISO). The standard for HDLC is ISO/IEC 13239:2002. 
@@ -142,6 +175,7 @@ The receiver has:
 
 
 ## Arduino Pro Mini Power Consumption
+
 Various approaches exist to reduce the power consumption of an Arduino. Of high impact is often to remove the power LED.
 
 | Mode             | with power LED  | without power LED    |
@@ -155,4 +189,5 @@ Various approaches exist to reduce the power consumption of an Arduino. Of high 
 
 
 ## License
+
 AGPL3, see [LICENSE](LICENSE).

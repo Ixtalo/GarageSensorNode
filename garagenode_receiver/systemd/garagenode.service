@@ -4,12 +4,12 @@ Description=Garage Node Receiver MQTT
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /mnt/data/garagenode/garagenode_receiver_mqtt.py config.json
+ExecStart=/opt/GarageSensorNode/garagenode_receiver/.venv/bin/python3 /opt/GarageSensorNode/garagenode_receiver/garagenode_receiver_mqtt.py
 Nice=-5
 User=ast
 Restart=on-failure
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=journal
+StandardError=journal
 SyslogIdentifier=garagenode
 
 

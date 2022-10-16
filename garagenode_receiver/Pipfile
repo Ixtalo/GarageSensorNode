@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+docopt = ">=0.6"
+python-dotenv = "*"
+pyserial = "==3.4"
+paho-mqtt = "==1.3.1"
+
+[dev-packages]
+pytest = "*"
+pytest-env = "*"
